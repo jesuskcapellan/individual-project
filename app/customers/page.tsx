@@ -1,10 +1,10 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Header } from '@/components/header';
-import MobileNav, { MobileNavProps } from '@/components/mobile-nav';
-import PageWrapper from '@/components/page-wrapper';
 import SideNav, { SideNavProps } from '@/components/side-nav';
+import PageWrapper from '@/components/page-wrapper';
+import { Breadcrumbs } from '@/components/breadcrumbs';
+import MobileNav, { MobileNavProps } from '@/components/mobile-nav';
 
-export default async function Home() {
+export default async function CustomersPage() {
     const navItems: MobileNavProps | SideNavProps = {
         logo: { icon: 'Target', alt: 'Pinpoint Video' },
         items: [
@@ -12,7 +12,6 @@ export default async function Home() {
                 label: 'Dashboard',
                 href: '/',
                 icon: 'House',
-                active: true,
             },
             {
                 label: 'Films',
@@ -23,6 +22,7 @@ export default async function Home() {
                 label: 'Customers',
                 href: '/customers',
                 icon: 'Users',
+                active: true,
             },
         ],
     };
@@ -32,7 +32,11 @@ export default async function Home() {
                 <Header
                     breadcrumbs={
                         <Breadcrumbs
-                            items={[{ label: 'Dashboard', href: '/' }]}
+                            items={[
+                                { label: 'Dashboard', href: '/' },
+                                { label: 'Customers', href: '/customers' },
+                                { label: 'All Customers', href: '/customers' },
+                            ]}
                         />
                     }
                     mobileNav={<MobileNav {...navItems} />}
@@ -40,7 +44,7 @@ export default async function Home() {
             }
             sideNav={<SideNav {...navItems} />}
         >
-            Landing Page
+            Customers Page
         </PageWrapper>
     );
 }
