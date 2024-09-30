@@ -1,9 +1,11 @@
+import { Actor } from "./actor";
+
 export interface Film {
-    id: string;
+    id: number;
     title: string;
-    status: string;
     description: string;
-    length: string;
-    release_year: string;
+    actors: Actor[];
     category: string;
 }
+
+export type Films = Film[];
