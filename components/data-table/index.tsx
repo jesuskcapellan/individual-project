@@ -10,7 +10,6 @@ import {
     getCoreRowModel,
     getFacetedRowModel,
     getFacetedUniqueValues,
-    getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
@@ -27,24 +26,34 @@ import {
 
 import { DataTablePagination } from './pagination';
 import { DataTableToolbar } from './toolbar';
+import { useRouter } from 'next/navigation';
+
+interface Filter {
+    id: string;
+    title: string;
+    options: {
+        label: string;
+        value: string;
+    }[];
+}
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
-    filters: {
-        id: string;
-        title: string;
-        options: {
-            label: string;
-            value: string;
-        }[];
-    }[];
+    filters: Filter[];
+    rowCount: number;
+    page: number;
+    pageSize: number;
+    order: string[];
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
     filters,
+    rowCount,
+    page,
+    pageSize,
 }: DataTableProps<TData, TValue>) {
     const [rowSelection, setRowSelection] = React.useState({});
     const [columnVisibility, setColumnVisibility] =
@@ -52,6 +61,11 @@ export function DataTable<TData, TValue>({
     const [columnFilters, setColumnFilters] =
         React.useState<ColumnFiltersState>([]);
     const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [pagination, setPagination] = React.useState({
+        pageIndex: page,
+        pageSize,
+    });
+    const router = useRouter();
 
     const table = useReactTable({
         data,
@@ -61,18 +75,103 @@ export function DataTable<TData, TValue>({
             columnVisibility,
             rowSelection,
             columnFilters,
+            pagination,
         },
         enableRowSelection: true,
         onRowSelectionChange: setRowSelection,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
+        onSortingChange: (updater) => {
+            const newSorting =
+                typeof updater === 'function' ? updater(sorting) : updater;
+            setSorting(newSorting);
+            router.replace(
+                `/films?page=${pagination.pageIndex + 1}&pageSize=${
+                    pagination.pageSize
+                }${columnFilters
+                    .map((filter) => {
+                        const filterOption = filters.find(
+                            (f) => f.id === filter.id
+                        );
+                        if (filter.id === 'title') {
+                            return `&search=${filter.value}`;
+                        }
+                        if (filterOption) {
+                            return `&${filter.id}=${filter.value}`;
+                        }
+                        return '';
+                    })
+                    .join('')}${newSorting
+                    .map((sort) => {
+                        return `&order=${sort.desc ? 'desc' : 'asc'}`;
+                    })
+                    .join('')}`
+            );
+        },
+        onColumnFiltersChange: (updater) => {
+            const newColumnFilters =
+                typeof updater === 'function'
+                    ? updater(columnFilters)
+                    : updater;
+            setColumnFilters(newColumnFilters);
+            router.replace(
+                `/films?page=${pagination.pageIndex + 1}&pageSize=${
+                    pagination.pageSize
+                }${newColumnFilters
+                    .map((filter) => {
+                        const filterOption = filters.find(
+                            (f) => f.id === filter.id
+                        );
+                        if (filter.id === 'title') {
+                            return `&search=${filter.value}`;
+                        }
+                        if (filterOption) {
+                            return `&${filter.id}=${filter.value}`;
+                        }
+                        return '';
+                    })
+                    .join('')}${sorting
+                    .map((sort) => {
+                        return `&order=${sort.desc ? 'desc' : 'asc'}`;
+                    })
+                    .join('')}`
+            );
+        },
         onColumnVisibilityChange: setColumnVisibility,
         getCoreRowModel: getCoreRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
+        manualPagination: true,
+        rowCount,
+        onPaginationChange: (updater) => {
+            const newPagination =
+                typeof updater === 'function' ? updater(pagination) : updater;
+            setPagination(newPagination);
+            router.replace(
+                `/films?page=${newPagination.pageIndex + 1}&pageSize=${
+                    newPagination.pageSize
+                }${columnFilters
+                    .map((filter) => {
+                        const filterOption = filters.find(
+                            (f) => f.id === filter.id
+                        );
+                        if (filter.id === 'title') {
+                            return `&search=${filter.value}`;
+                        }
+                        if (filterOption) {
+                            return `&${filter.id}=${filter.value}`;
+                        }
+                        return '';
+                    })
+                    .join('')}${sorting
+                    .map((sort) => {
+                        return `&order=${sort.desc ? 'desc' : 'asc'}`;
+                    })
+                    .join('')}`
+            );
+        },
+        manualFiltering: true,
+        manualSorting: true,
     });
 
     return (

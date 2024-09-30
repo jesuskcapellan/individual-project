@@ -6,36 +6,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 import { DataTableColumnHeader } from '@/components/data-table/header';
 import { DataTableRowActions } from '@/components/data-table/actions';
-import { Badge, BadgeProps } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { Film } from '@/types/film';
-
-const categories = [
-    {
-        value: 'action',
-        label: 'Action',
-    },
-    {
-        value: 'comedy',
-        label: 'Comedy',
-    },
-];
-
-const statuses: {
-    value: string;
-    label: string;
-    variant: BadgeProps['variant'];
-}[] = [
-    {
-        value: 'available',
-        label: 'Available',
-        variant: 'outline',
-    },
-    {
-        value: 'unavailable',
-        label: 'Unavailable',
-        variant: 'destructive',
-    },
-];
+import { formatTitleCase } from '@/lib/utils';
 
 export const columns: ColumnDef<Film>[] = [
     {
@@ -43,11 +16,11 @@ export const columns: ColumnDef<Film>[] = [
         header: ({ table }) => (
             <Checkbox
                 checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && 'indeterminate')
+                    table.getIsAllRowsSelected() ||
+                    (table.getIsSomeRowsSelected() && 'indeterminate')
                 }
                 onCheckedChange={(value) =>
-                    table.toggleAllPageRowsSelected(!!value)
+                    table.toggleAllRowsSelected(!!value)
                 }
                 aria-label="Select all"
                 className="translate-y-[2px]"
@@ -65,15 +38,6 @@ export const columns: ColumnDef<Film>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: 'id',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="ID" />
-        ),
-        cell: ({ row }) => <div className="w-[80px]">{row.getValue('id')}</div>,
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
         accessorKey: 'title',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Title" />
@@ -82,11 +46,12 @@ export const columns: ColumnDef<Film>[] = [
             return (
                 <div className="flex space-x-2">
                     <span className="max-w-[500px] truncate font-medium">
-                        {row.getValue('title')}
+                        {formatTitleCase(row.getValue('title') as string)}
                     </span>
                 </div>
             );
         },
+        enableHiding: false,
     },
     {
         accessorKey: 'description',
@@ -96,30 +61,31 @@ export const columns: ColumnDef<Film>[] = [
         cell: ({ row }) => (
             <div className="w-[500px]">{row.getValue('description')}</div>
         ),
+        enableSorting: false,
+        enableHiding: false,
     },
     {
-        accessorKey: 'status',
+        accessorKey: 'actors',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Status" />
+            <DataTableColumnHeader column={column} title="Actors" />
         ),
         cell: ({ row }) => {
-            const status = statuses.find(
-                (status) => status.value === row.getValue('status')
-            );
+            const actors = row.getValue('actors');
 
-            if (!status) {
+            if (!Array.isArray(actors)) {
                 return null;
             }
-
+            const titleCaseActors = actors.map((actor) =>
+                formatTitleCase(actor)
+            );
             return (
-                <div className="flex w-[100px] items-center">
-                    <Badge variant={status.variant}>{status.label}</Badge>
+                <div className="max-w-[400px]">
+                    {titleCaseActors.join(', ')}
                 </div>
             );
         },
-        filterFn: (row, id, value) => {
-            return value.includes(row.getValue(id));
-        },
+        enableSorting: false,
+        enableHiding: false,
     },
     {
         accessorKey: 'category',
@@ -127,45 +93,43 @@ export const columns: ColumnDef<Film>[] = [
             <DataTableColumnHeader column={column} title="Category" />
         ),
         cell: ({ row }) => {
-            const category = categories.find(
-                (category) => category.value === row.getValue('category')
+            return (
+                <Badge variant="secondary">{row.getValue('category')}</Badge>
             );
-
-            if (!category) {
-                return null;
-            }
-
+        },
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: 'status',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Status" />
+        ),
+        cell: ({ row }) => {
             return (
                 <div className="flex w-[100px] items-center">
-                    <span>{category.label}</span>
+                    <Badge
+                        variant={
+                            row.getValue('status') === 'available'
+                                ? 'default'
+                                : 'outline'
+                        }
+                        className="capitalize"
+                    >
+                        {row.getValue('status')}
+                    </Badge>
                 </div>
             );
         },
         filterFn: (row, id, value) => {
             return value.includes(row.getValue(id));
         },
-    },
-    {
-        accessorKey: 'length',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Length" />
-        ),
-        cell: ({ row }) => (
-            <div className="w-[100px]">{row.getValue('length')}</div>
-        ),
-    },
-    {
-        id: 'release year',
-        accessorKey: 'release_year',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Release Year" />
-        ),
-        cell: ({ row }) => (
-            <div className="w-[100px]">{row.getValue('release year')}</div>
-        ),
+        enableSorting: false,
+        enableHiding: false,
     },
     {
         id: 'actions',
         cell: () => <DataTableRowActions />,
+        enableHiding: false,
     },
 ];
