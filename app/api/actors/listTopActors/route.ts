@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server";
-import { listActors } from ".";
+import { NextRequest, NextResponse } from "next/server";
+import { listTopActors } from ".";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+    const searchParams = request.nextUrl.searchParams;
+    const take = parseInt(searchParams.get("take") || "5", 10);
+
     try {
-        const result = await listActors();
+        const result = await listTopActors({ take });
         return NextResponse.json(result, { status: 200 });
     } catch (error) {
         if (error instanceof Error) {

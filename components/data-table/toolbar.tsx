@@ -1,24 +1,18 @@
-'use client';
+"use client";
 
-import { Cross2Icon } from '@radix-ui/react-icons';
-import { Table } from '@tanstack/react-table';
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { Table } from "@tanstack/react-table";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-import { DataTableFacetedFilter } from './filter';
+import { DataTableFacetedFilter } from "./filter";
+import { Filter } from "./filter";
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>;
     placeholder: string;
-    filters: {
-        id: string;
-        title: string;
-        options: {
-            label: string;
-            value: string;
-        }[];
-    }[];
+    filters: Filter[];
 }
 
 export function DataTableToolbar<TData>({
@@ -27,7 +21,6 @@ export function DataTableToolbar<TData>({
     filters,
 }: DataTableToolbarProps<TData>) {
     const isFiltered = table.getState().columnFilters.length > 0;
-
     return (
         <div className="flex items-center justify-between">
             <div className="flex flex-1 items-center space-x-2">
@@ -35,24 +28,28 @@ export function DataTableToolbar<TData>({
                     placeholder={placeholder}
                     value={
                         (table
-                            .getColumn('title')
-                            ?.getFilterValue() as string) ?? ''
+                            .getColumn("title")
+                            ?.getFilterValue() as string) ?? ""
                     }
                     onChange={(event) =>
                         table
-                            .getColumn('title')
+                            .getColumn("title")
                             ?.setFilterValue(event.target.value)
                     }
                     className="h-8 w-[150px] lg:w-[250px]"
                 />
-                {filters.map((filter) => (
-                    <DataTableFacetedFilter
-                        key={filter.id}
-                        column={table.getColumn(filter.id)}
-                        title={filter.title}
-                        options={filter.options}
-                    />
-                ))}
+                {filters
+                    .filter((item) => item.type === "property")
+                    .map((filter) => (
+                        <div key={filter.id}>
+                            <DataTableFacetedFilter
+                                key={filter.id}
+                                column={table.getColumn(filter.id)}
+                                title={filter.title}
+                                options={filter.options}
+                            />
+                        </div>
+                    ))}
                 {isFiltered && (
                     <Button
                         variant="ghost"

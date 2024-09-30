@@ -3,9 +3,9 @@ import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
-} from '@/components/ui/tooltip';
-import Link from 'next/link';
-import Icon, { IconProps } from './icon';
+} from "@/components/ui/tooltip";
+import Link from "next/link";
+import Icon, { IconProps } from "./icon";
 
 export interface SideNavProps {
     logo: { alt: string; icon: IconProps.Icon };
@@ -38,11 +38,10 @@ export default function SideNav({ logo, items, bottomItems }: SideNavProps) {
                             <TooltipTrigger asChild>
                                 <Link
                                     href={item.href}
-                                    className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-                                        item.active
-                                            ? 'text-accent-foreground'
-                                            : 'text-muted-foreground'
-                                    } transition-colors hover:text-foreground md:h-8 md:w-8`}
+                                    className={`flex h-9 w-9 items-center justify-center rounded-lg ${item.active
+                                            ? "text-accent-foreground"
+                                            : "text-muted-foreground"
+                                        } transition-colors hover:text-foreground md:h-8 md:w-8`}
                                 >
                                     <Icon
                                         icon={item.icon}

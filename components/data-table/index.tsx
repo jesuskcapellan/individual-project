@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { debounce } from "lodash";
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -28,21 +27,14 @@ import {
 
 import { DataTablePagination } from "./pagination";
 import { DataTableToolbar } from "./toolbar";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-
-interface Filter {
-    id: string;
-    title: string;
-    options: {
-        label: string;
-        value: string;
-    }[];
-}
+import { Filter } from "./filter";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    url: string;
     filters: Filter[];
     pagination: {
         page: number;
@@ -51,13 +43,15 @@ interface DataTableProps<TData, TValue> {
     };
 }
 
-function baseGenerateLink({
+function generateLink({
+    url,
     router,
     pagination,
     columnFilters,
     filters,
     totalPages,
 }: {
+    url: string;
     router: AppRouterInstance;
     pagination: PaginationState;
     columnFilters: ColumnFiltersState;
@@ -72,38 +66,50 @@ function baseGenerateLink({
     const filtersString = columnFilters
         .map((filter) => {
             const filterOption = filters.find((f) => f.id === filter.id);
-            if (filter.id === "title") {
-                return `&search=${filter.value}`;
-            }
             if (filterOption) {
                 return `&${filter.id}=${filter.value}`;
             }
             return "";
         })
-        .join("&");
-    router.replace(`/films?${pageString}${takeString}${filtersString}`);
+        .join();
+    router.replace(`${url}?${pageString}${takeString}${filtersString}`);
 }
-
-const generateLink = debounce(baseGenerateLink, 500);
 
 export function DataTable<TData, TValue>({
     columns,
     data,
+    url,
     filters,
     pagination: { page, take, rowCount },
 }: DataTableProps<TData, TValue>) {
+    const searchParams = useSearchParams();
     const [rowSelection, setRowSelection] = React.useState({});
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({});
     const [columnFilters, setColumnFilters] =
-        React.useState<ColumnFiltersState>([]);
+        React.useState<ColumnFiltersState>(
+            searchParams
+                ? Array.from(searchParams.entries())
+                    .filter(
+                        ([key]) =>
+                            filters.find((f) => f.id === key) !== undefined
+                    )
+                    .map(([key, value]) => {
+                        return {
+                            id: key,
+                            value: value!.split(","),
+                            desc: false,
+                        };
+                    })
+                : []
+        );
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [pagination, setPagination] = React.useState({
         pageIndex: page,
         pageSize: take,
     });
     const router = useRouter();
-
+    console.log(pagination, columnFilters);
     const table = useReactTable({
         data,
         columns,
@@ -122,10 +128,16 @@ export function DataTable<TData, TValue>({
                 typeof updater === "function"
                     ? updater(columnFilters)
                     : updater;
+            const newPagination = {
+                pageIndex: 0,
+                pageSize: pagination.pageSize,
+            };
+            setPagination(newPagination);
             setColumnFilters(newColumnFilters);
             generateLink({
+                url,
                 router,
-                pagination,
+                pagination: newPagination,
                 columnFilters: newColumnFilters,
                 filters,
                 totalPages: Math.ceil(rowCount / pagination.pageSize),
@@ -144,6 +156,7 @@ export function DataTable<TData, TValue>({
                 typeof updater === "function" ? updater(pagination) : updater;
             setPagination(newPagination);
             generateLink({
+                url,
                 router,
                 pagination: newPagination,
                 columnFilters,

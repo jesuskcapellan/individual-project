@@ -14,5 +14,9 @@ export async function listActors(): Promise<ListActorsResponse> {
             first_name: "asc",
         },
     });
-    return actors;
+    return actors.map((actor) => ({
+        id: actor.actor_id,
+        first_name: actor.first_name,
+        last_name: actor.last_name,
+    }));
 }

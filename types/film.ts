@@ -6,6 +6,7 @@ export interface Film {
     description: string;
     actors: Actor[];
     category: string;
+    rentals?: number;
 }
 
 export type Films = Film[];
