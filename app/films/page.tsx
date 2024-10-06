@@ -17,6 +17,7 @@ import { listFilms } from "@/app/api/films/listFilms";
 import { listActors } from "../api/actors/listActors";
 import { formatTitleCase } from "@/lib/utils";
 import { listCategories } from "../api/categories/listCategories";
+import { Filter } from "@/components/data-table/filter";
 
 export default async function FilmsPage({
     searchParams,
@@ -24,11 +25,12 @@ export default async function FilmsPage({
     searchParams: {
         page: string;
         take: string;
-        search: string;
+        title: string;
         category: string;
         actors: string;
     };
 }) {
+    console.log(searchParams);
     const page = searchParams.page
         ? parseInt(searchParams.page) >= 1
             ? parseInt(searchParams.page)
@@ -39,7 +41,7 @@ export default async function FilmsPage({
             ? parseInt(searchParams.take)
             : 5
         : 5;
-    const search = searchParams.search || "";
+    const search = searchParams.title || "";
     const actors = searchParams.actors ? searchParams.actors.split(",") : [];
     const categories = searchParams.category
         ? searchParams.category.split(",")
@@ -57,19 +59,26 @@ export default async function FilmsPage({
     const actorsData = await listActors();
     const categoriesData = await listCategories();
 
-    const filters = [
+    const filters: Filter[] = [
+        {
+            id: "title",
+            type: "text",
+            text: search,
+        },
         {
             id: "actors",
+            type: "property",
             title: "Actors",
             options: actorsData.map((actor) => ({
                 label: formatTitleCase(
                     `${actor.first_name} ${actor.last_name}`
                 ),
-                value: actor.actor_id.toString(),
+                value: actor.id.toString(),
             })),
         },
         {
             id: "category",
+            type: "property",
             title: "Category",
             options: categoriesData.map((category) => ({
                 label: category.name,
@@ -106,6 +115,7 @@ export default async function FilmsPage({
                 </CardHeader>
                 <CardContent>
                     <DataTable
+                        url="/films"
                         columns={columns}
                         data={filmsData.films}
                         filters={filters}

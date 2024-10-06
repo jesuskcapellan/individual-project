@@ -1,10 +1,11 @@
 import { Film } from "./film";
 
 export interface Actor {
-    actor_id: number;
+    id: number;
     first_name: string;
     last_name: string;
     films?: Omit<Film, "actors">[];
+    totalFilmRentals?: number;
 }
 
 export type Actors = Actor[];

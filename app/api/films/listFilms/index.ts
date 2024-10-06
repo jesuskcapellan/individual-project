@@ -105,7 +105,11 @@ export async function listFilms({
             id: film.film_id,
             title: film.title,
             description: film.description || "",
-            actors: film.film_actor.map((a) => a.actor),
+            actors: film.film_actor.map((fa) => ({
+                id: fa.actor.actor_id,
+                first_name: fa.actor.first_name,
+                last_name: fa.actor.last_name,
+            })),
             category: film.film_category[0].category.name,
         })),
         pagination: {
