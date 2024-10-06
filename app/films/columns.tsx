@@ -6,6 +6,7 @@ import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Badge } from "@/components/ui/badge";
 import { Film } from "@/types/film";
 import { formatTitleCase } from "@/lib/utils";
+import { DataTableRowActions } from "@/components/data-table/actions";
 
 export const columns: ColumnDef<Film>[] = [
     {
@@ -48,7 +49,7 @@ export const columns: ColumnDef<Film>[] = [
                 return null;
             }
             const titleCaseActors = actors.map((actor) =>
-                formatTitleCase(`${actor.first_name} ${actor.last_name}`)
+                formatTitleCase(actor.name)
             );
             return (
                 <div className="max-w-[400px]">
@@ -70,6 +71,48 @@ export const columns: ColumnDef<Film>[] = [
             );
         },
         enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "status",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Status" />
+        ),
+        cell: ({ row }) => {
+            return (
+                <div className="flex w-[100px] items-center">
+                    <Badge
+                        variant={
+                            row.getValue("status") === "available"
+                                ? "default"
+                                : "outline"
+                        }
+                        className="capitalize"
+                    >
+                        {row.getValue("status")}
+                    </Badge>
+                </div>
+            );
+        },
+        filterFn: (row, id, value) => {
+            return value.includes(row.getValue(id));
+        },
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        id: "actions",
+        cell: ({ row }) => (
+            <DataTableRowActions
+                items={[
+                    {
+                        type: "link",
+                        label: "Rent",
+                        href: `/films/${row.original.id}/rent`,
+                    },
+                ]}
+            />
+        ),
         enableHiding: false,
     },
 ];
