@@ -30,7 +30,6 @@ export default async function FilmsPage({
         actors: string;
     };
 }) {
-    console.log(searchParams);
     const page = searchParams.page
         ? parseInt(searchParams.page) >= 1
             ? parseInt(searchParams.page)
@@ -107,7 +106,6 @@ export default async function FilmsPage({
             <Card>
                 <CardHeader>
                     <CardTitle>Films</CardTitle>
-
                     <CardDescription>
                         Manage your films here. Add, edit, or remove films.
                     </CardDescription>

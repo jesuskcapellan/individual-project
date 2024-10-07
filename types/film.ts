@@ -10,3 +10,16 @@ export interface Film {
 }
 
 export type Films = Film[];
+
+export interface FilmCopy {
+    filmId: number;
+    inventoryId: number;
+    storeId: number;
+    storeAddress: string;
+    rentals: {
+        rental_date: Date;
+        return_date: Date | null;
+    }[];
+}
+
+export type FilmCopies = FilmCopy[];

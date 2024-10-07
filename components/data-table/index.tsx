@@ -90,17 +90,17 @@ export function DataTable<TData, TValue>({
         React.useState<ColumnFiltersState>(
             searchParams
                 ? Array.from(searchParams.entries())
-                      .filter(
-                          ([key]) =>
-                              filters.find((f) => f.id === key) !== undefined
-                      )
-                      .map(([key, value]) => {
-                          return {
-                              id: key,
-                              value: value!.split(","),
-                              desc: false,
-                          };
-                      })
+                    .filter(
+                        ([key]) =>
+                            filters.find((f) => f.id === key) !== undefined
+                    )
+                    .map(([key, value]) => {
+                        return {
+                            id: key,
+                            value: value!.split(","),
+                            desc: false,
+                        };
+                    })
                 : []
         );
     const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -109,7 +109,6 @@ export function DataTable<TData, TValue>({
         pageSize: take,
     });
     const router = useRouter();
-    console.log(pagination, columnFilters);
     const table = useReactTable({
         data,
         columns,
@@ -189,10 +188,10 @@ export function DataTable<TData, TValue>({
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext()
-                                                  )}
+                                                    header.column.columnDef
+                                                        .header,
+                                                    header.getContext()
+                                                )}
                                         </TableHead>
                                     );
                                 })}

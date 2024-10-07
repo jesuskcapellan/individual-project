@@ -49,7 +49,7 @@ export const columns: ColumnDef<Film>[] = [
                 return null;
             }
             const titleCaseActors = actors.map((actor) =>
-                formatTitleCase(actor.name)
+                formatTitleCase(`${actor.first_name} ${actor.last_name}`)
             );
             return (
                 <div className="max-w-[400px]">
@@ -69,33 +69,6 @@ export const columns: ColumnDef<Film>[] = [
             return (
                 <Badge variant="secondary">{row.getValue("category")}</Badge>
             );
-        },
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: "status",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Status" />
-        ),
-        cell: ({ row }) => {
-            return (
-                <div className="flex w-[100px] items-center">
-                    <Badge
-                        variant={
-                            row.getValue("status") === "available"
-                                ? "default"
-                                : "outline"
-                        }
-                        className="capitalize"
-                    >
-                        {row.getValue("status")}
-                    </Badge>
-                </div>
-            );
-        },
-        filterFn: (row, id, value) => {
-            return value.includes(row.getValue(id));
         },
         enableSorting: false,
         enableHiding: false,
