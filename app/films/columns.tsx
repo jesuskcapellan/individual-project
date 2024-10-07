@@ -6,6 +6,7 @@ import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Badge } from "@/components/ui/badge";
 import { Film } from "@/types/film";
 import { formatTitleCase } from "@/lib/utils";
+import { DataTableRowActions } from "@/components/data-table/actions";
 
 export const columns: ColumnDef<Film>[] = [
     {
@@ -70,6 +71,21 @@ export const columns: ColumnDef<Film>[] = [
             );
         },
         enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        id: "actions",
+        cell: ({ row }) => (
+            <DataTableRowActions
+                items={[
+                    {
+                        type: "link",
+                        label: "Rent",
+                        href: `/films/${row.original.id}/rent`,
+                    },
+                ]}
+            />
+        ),
         enableHiding: false,
     },
 ];

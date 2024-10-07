@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listTopFilms } from ".";
-import { parseInt } from "lodash";
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;

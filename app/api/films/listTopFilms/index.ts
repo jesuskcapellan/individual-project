@@ -50,7 +50,6 @@ export async function listTopFilms({
             },
         },
     });
-
     return topFilms
         .map((film) => ({
             id: film.film_id,

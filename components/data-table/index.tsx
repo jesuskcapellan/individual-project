@@ -109,7 +109,6 @@ export function DataTable<TData, TValue>({
         pageSize: take,
     });
     const router = useRouter();
-    console.log(pagination, columnFilters);
     const table = useReactTable({
         data,
         columns,
