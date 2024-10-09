@@ -69,9 +69,7 @@ export default async function FilmsPage({
             type: "property",
             title: "Actors",
             options: actorsData.map((actor) => ({
-                label: formatTitleCase(
-                    `${actor.first_name} ${actor.last_name}`
-                ),
+                label: formatTitleCase(`${actor.first_name} ${actor.last_name}`),
                 value: actor.id.toString(),
             })),
         },

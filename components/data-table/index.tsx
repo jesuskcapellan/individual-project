@@ -86,23 +86,19 @@ export function DataTable<TData, TValue>({
     const [rowSelection, setRowSelection] = React.useState({});
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({});
-    const [columnFilters, setColumnFilters] =
-        React.useState<ColumnFiltersState>(
-            searchParams
-                ? Array.from(searchParams.entries())
-                    .filter(
-                        ([key]) =>
-                            filters.find((f) => f.id === key) !== undefined
-                    )
-                    .map(([key, value]) => {
-                        return {
-                            id: key,
-                            value: value!.split(","),
-                            desc: false,
-                        };
-                    })
-                : []
-        );
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+        searchParams
+            ? Array.from(searchParams.entries())
+                .filter(([key]) => filters.find((f) => f.id === key) !== undefined)
+                .map(([key, value]) => {
+                    return {
+                        id: key,
+                        value: value!.split(","),
+                        desc: false,
+                    };
+                })
+            : []
+    );
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [pagination, setPagination] = React.useState({
         pageIndex: page,
@@ -124,9 +120,7 @@ export function DataTable<TData, TValue>({
         onSortingChange: setSorting,
         onColumnFiltersChange: (updater) => {
             const newColumnFilters =
-                typeof updater === "function"
-                    ? updater(columnFilters)
-                    : updater;
+                typeof updater === "function" ? updater(columnFilters) : updater;
             const newPagination = {
                 pageIndex: 0,
                 pageSize: pagination.pageSize,
@@ -169,11 +163,7 @@ export function DataTable<TData, TValue>({
 
     return (
         <div className="space-y-4">
-            <DataTableToolbar
-                table={table}
-                placeholder="Search"
-                filters={filters}
-            />
+            <DataTableToolbar table={table} placeholder="Search" filters={filters} />
             <div className="">
                 <Table>
                     <TableHeader>
@@ -181,15 +171,11 @@ export function DataTable<TData, TValue>({
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead
-                                            key={header.id}
-                                            colSpan={header.colSpan}
-                                        >
+                                        <TableHead key={header.id} colSpan={header.colSpan}>
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                    header.column.columnDef
-                                                        .header,
+                                                    header.column.columnDef.header,
                                                     header.getContext()
                                                 )}
                                         </TableHead>
@@ -203,9 +189,7 @@ export function DataTable<TData, TValue>({
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && "selected"
-                                    }
+                                    data-state={row.getIsSelected() && "selected"}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
