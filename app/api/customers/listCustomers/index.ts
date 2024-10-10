@@ -7,7 +7,7 @@ export interface ListCustomersInput {
     take?: number;
     filters?: {
         id?: number;
-        search?: string;
+        name?: string;
     };
 }
 
@@ -23,13 +23,13 @@ export interface ListCustomersResponse {
 
 export async function listCustomers({
     page = 1,
-    take = 10,
+    take = 5,
     filters,
 }: ListCustomersInput): Promise<ListCustomersResponse> {
     const whereClause: Prisma.customerWhereInput = {};
 
-    if (filters && filters.search) {
-        whereClause.OR = filters.search.split(" ").map((word) => ({
+    if (filters && filters.name) {
+        whereClause.OR = filters.name.split(" ").map((word) => ({
             OR: [
                 { first_name: { contains: word } },
                 { last_name: { contains: word } },
@@ -42,8 +42,8 @@ export async function listCustomers({
     const [customers, customerCount] = await prisma.$transaction([
         prisma.customer.findMany({
             where: whereClause,
-            skip: (page - 1) * take,
-            take,
+            skip: page > 0 ? (page - 1) * take : 0,
+            take: [5, 10, 20, 30, 40, 50].includes(take) ? take : 5,
             orderBy: {
                 customer_id: "asc",
             },

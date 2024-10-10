@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -16,7 +16,7 @@ export function isNullOrUndefined(value: unknown) {
 export function formatFilmLength(length: number | string): string {
     const minutes = Number(length);
     if (isNaN(minutes)) {
-        return 'Invalid length';
+        return "Invalid length";
     }
 
     const hours = Math.floor(minutes / 60);
@@ -33,9 +33,16 @@ export function formatFilmLength(length: number | string): string {
 
 export function formatTitleCase(title: string): string {
     return title
-        .split(' ')
+        .split(" ")
         .map(
             (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         )
-        .join(' ');
+        .join(" ");
+}
+
+export function validateNumeric(param: string | null | undefined) {
+    if (isDefined(param)) {
+        const parsedParam = parseInt(param);
+        return isNaN(parsedParam) ? undefined : parsedParam;
+    }
 }

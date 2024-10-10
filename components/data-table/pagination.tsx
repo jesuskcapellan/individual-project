@@ -56,8 +56,12 @@ export function DataTablePagination<TData>({
                     </Select>
                 </div>
                 <div className="flex max-w-[120px] items-center justify-center text-sm font-medium">
-                    Page {table.getState().pagination.pageIndex + 1} of{" "}
-                    {table.getPageCount()}
+                    Page{" "}
+                    {table.getState().pagination.pageIndex + 1 <=
+                        table.getPageCount()
+                        ? table.getState().pagination.pageIndex + 1
+                        : table.getPageCount()}{" "}
+                    of {table.getPageCount()}
                 </div>
                 <div className="flex items-center space-x-2">
                     <Button

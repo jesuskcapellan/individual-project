@@ -3,7 +3,7 @@ import SideNav, { SideNavProps } from "@/components/side-nav";
 import PageWrapper from "@/components/page-wrapper";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import MobileNav, { MobileNavProps } from "@/components/mobile-nav";
-import { listCustomers } from "../api/categories/customers/listCustomers";
+import { listCustomers } from "../api/customers/listCustomers";
 import {
     Card,
     CardContent,
@@ -13,32 +13,49 @@ import {
 } from "@/components/ui/card";
 import { DataTable } from "@/components/data-table";
 import { columns } from "./colummns";
-import { formatTitleCase } from "@/lib/utils";
+import { formatTitleCase, validateNumeric } from "@/lib/utils";
 import { Filter } from "@/components/data-table/filter";
+import { redirect } from "next/navigation";
 
 export default async function CustomersPage({
-    searchParams: { page = "1", take = "5", name = "", id = "" },
+    searchParams,
 }: {
     searchParams: { page?: string; take?: string; name?: string; id?: string };
 }) {
-    const pageParam = isNaN(parseInt(page)) ? 1 : parseInt(page);
-    const takeParam = isNaN(parseInt(take)) ? 1 : parseInt(take);
-    const idParam = isNaN(parseInt(id)) ? undefined : parseInt(id);
+    const page = validateNumeric(searchParams.page);
+    const take = validateNumeric(searchParams.take);
+    const id = validateNumeric(searchParams.id);
+    const name = searchParams.name;
+
     const { customers, pagination } = await listCustomers({
-        page: pageParam,
-        take: takeParam,
-        filters: { search: name, id: idParam },
+        page: page,
+        take: take,
+        filters: { name, id },
     });
+
+    if (page && page > pagination.totalPages) {
+        const takeUrl = take ? "&take=" + take : "";
+        const idUrl = id ? "&id=" + id : "";
+        const nameUrl = name ? "&name=" + name : "";
+        redirect(
+            "/customers?page=" +
+            pagination.totalPages +
+            takeUrl +
+            idUrl +
+            nameUrl
+        );
+    }
+
     const tableFilters: Filter[] = [
         {
             id: "id",
             type: "text",
-            text: id,
+            text: searchParams.id || "",
         },
         {
             id: "name",
             type: "text",
-            text: name,
+            text: searchParams.name || "",
         },
     ];
     return (
@@ -77,8 +94,8 @@ export default async function CustomersPage({
                         filters={tableFilters}
                         pagination={{
                             rowCount: pagination.totalItems,
-                            page: pageParam - 1,
-                            take: takeParam,
+                            page: page ? page - 1 : 1,
+                            take: take ? take : 5,
                         }}
                     />
                 </CardContent>
