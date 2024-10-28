@@ -1,30 +1,23 @@
+import React from "react";
+import { EditCustomerForm } from "./form";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Header } from "@/components/header";
 import MobileNav, { MobileNavProps } from "@/components/mobile-nav";
 import PageWrapper from "@/components/page-wrapper";
 import SideNav, { SideNavProps } from "@/components/side-nav";
-import { listCustomerRentals } from "@/server/rentals/listRentals";
-import { notFound } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { listStores } from "@/server/stores/listStores";
+import { listAddresses } from "@/server/addresses/listAddresses";
 import { getCustomer } from "@/server/customers/getCustomer";
+import { notFound } from "next/navigation";
+import { parseInt } from "lodash";
 import { formatTitleCase } from "@/lib/utils";
-import { CustomerPageContent } from "./content";
 
-export default async function CustomerDetailsPage({
+export default async function Page({
     params,
-    searchParams,
 }: {
     params: { customerId: string };
-    searchParams?: { page?: string; take?: string; submit?: string };
 }) {
-    const page =
-        searchParams?.page && !isNaN(parseInt(searchParams?.page))
-            ? parseInt(searchParams.page)
-            : 1;
-    const take =
-        searchParams?.take && !isNaN(parseInt(searchParams?.take))
-            ? parseInt(searchParams.take)
-            : 5;
-
     if (isNaN(parseInt(params.customerId))) {
         notFound();
     }
@@ -34,11 +27,9 @@ export default async function CustomerDetailsPage({
     if (!customer) {
         notFound();
     }
-    const { rentals, pagination } = await listCustomerRentals({
-        customerId: parseInt(params.customerId),
-        page,
-        take,
-    });
+    const stores = await listStores();
+    const addresses = await listAddresses({ address: "" });
+
     return (
         <PageWrapper
             header={
@@ -47,10 +38,13 @@ export default async function CustomerDetailsPage({
                         <Breadcrumbs
                             items={[
                                 { label: "Dashboard", href: "/" },
-                                { label: "Customers", href: "/customers" },
+                                {
+                                    label: "Customers",
+                                    href: "/customers",
+                                },
                                 {
                                     label: `${formatTitleCase(`${customer.first_name} ${customer.last_name}`)}`,
-                                    href: `/customers/${params.customerId}`,
+                                    href: `/customers/${customer.id}/edit`,
                                 },
                             ]}
                         />
@@ -60,15 +54,30 @@ export default async function CustomerDetailsPage({
             }
             sideNav={<SideNav {...navItems} />}
         >
-            <CustomerPageContent
-                customer={customer}
-                submit={searchParams?.submit}
-                data={rentals}
-                pagination={pagination}
-            />
+            <Card>
+                <CardHeader>
+                    <CardTitle>{`Edit ${formatTitleCase(`${customer.first_name} ${customer.last_name}`)}`}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <EditCustomerForm
+                        initialValues={{
+                            customerId: customer.id,
+                            firstName: customer.first_name,
+                            lastName: customer.last_name,
+                            email: customer.email,
+                            storeId: customer.store!.id,
+                            addressId: customer.address!.id,
+                            address: customer.address!.address,
+                        }}
+                        stores={stores}
+                        initialAddresses={[customer.address!, ...addresses]}
+                    />
+                </CardContent>
+            </Card>
         </PageWrapper>
     );
 }
+
 const navItems: MobileNavProps | SideNavProps = {
     logo: { icon: "Target", alt: "Pinpoint Video" },
     items: [

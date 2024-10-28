@@ -64,7 +64,7 @@ export function SelectForm({
 
     useEffect(() => {
         fetchCustomers(search).then((val) => {
-            setCustomers(val);
+            setCustomers(val.customers);
         });
     }, [search]);
 

@@ -5,10 +5,7 @@ import { Prisma } from "@prisma/client";
 export interface ListCustomersInput {
     page?: number;
     take?: number;
-    filters?: {
-        id?: number;
-        name?: string;
-    };
+    search?: number | string;
 }
 
 export interface ListCustomersResponse {
@@ -24,20 +21,20 @@ export interface ListCustomersResponse {
 export async function listCustomers({
     page = 1,
     take = 5,
-    filters,
+    search,
 }: ListCustomersInput): Promise<ListCustomersResponse> {
     const whereClause: Prisma.customerWhereInput = {};
 
-    if (filters && filters.name) {
-        whereClause.OR = filters.name.split(" ").map((word) => ({
+    if (search && typeof search === "string") {
+        whereClause.OR = search.split(" ").map((word) => ({
             OR: [
                 { first_name: { contains: word } },
                 { last_name: { contains: word } },
             ],
         }));
     }
-    if (filters && filters.id) {
-        whereClause.customer_id = filters.id;
+    if (search && typeof search === "number") {
+        whereClause.customer_id = search;
     }
     const [customers, customerCount] = await prisma.$transaction([
         prisma.customer.findMany({

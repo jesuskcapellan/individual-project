@@ -3,24 +3,24 @@ import SideNav, { SideNavProps } from "@/components/side-nav";
 import PageWrapper from "@/components/page-wrapper";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import MobileNav, { MobileNavProps } from "@/components/mobile-nav";
-import { listCustomers } from "../api/customers/listCustomers";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { DataTable } from "@/components/data-table";
-import { columns } from "./colummns";
-import { formatTitleCase, validateNumeric } from "@/lib/utils";
+import { listCustomers } from "@/server/customers/listCustomers";
+import { validateNumeric } from "@/lib/utils";
 import { Filter } from "@/components/data-table/filter";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { SkeletonCard } from "@/components/skeleton-card";
+import { CustomersPageContent } from "./content";
 
 export default async function CustomersPage({
     searchParams,
 }: {
-    searchParams: { page?: string; take?: string; name?: string; id?: string };
+    searchParams: {
+        page?: string;
+        take?: string;
+        name?: string;
+        id?: string;
+        delete?: string;
+    };
 }) {
     const page = validateNumeric(searchParams.page);
     const take = validateNumeric(searchParams.take);
@@ -30,10 +30,10 @@ export default async function CustomersPage({
     const { customers, pagination } = await listCustomers({
         page: page,
         take: take,
-        filters: { name, id },
+        search: id ?? name,
     });
 
-    if (page && page > pagination.totalPages) {
+    if (page && pagination.totalPages > 0 && page > pagination.totalPages) {
         const takeUrl = take ? "&take=" + take : "";
         const idUrl = id ? "&id=" + id : "";
         const nameUrl = name ? "&name=" + name : "";
@@ -58,6 +58,7 @@ export default async function CustomersPage({
             text: searchParams.name || "",
         },
     ];
+
     return (
         <PageWrapper
             header={
@@ -76,30 +77,14 @@ export default async function CustomersPage({
             }
             sideNav={<SideNav {...navItems} />}
         >
-            <Card>
-                <CardHeader>
-                    <CardTitle>Customers</CardTitle>
-                    <CardDescription>View your customers here.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <DataTable
-                        url="/customers"
-                        columns={columns}
-                        data={customers.map((customer) => ({
-                            ...customer,
-                            name: formatTitleCase(
-                                `${customer.first_name} ${customer.last_name}`
-                            ),
-                        }))}
-                        filters={tableFilters}
-                        pagination={{
-                            rowCount: pagination.totalItems,
-                            page: page ? page - 1 : 1,
-                            take: take ? take : 5,
-                        }}
-                    />
-                </CardContent>
-            </Card>
+            <Suspense fallback={<SkeletonCard variant="lg" />}>
+                <CustomersPageContent
+                    data={customers}
+                    pagination={pagination}
+                    deleteQuery={searchParams.delete}
+                    filters={tableFilters}
+                />
+            </Suspense>
         </PageWrapper>
     );
 }

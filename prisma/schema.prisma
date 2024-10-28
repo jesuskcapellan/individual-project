@@ -165,7 +165,7 @@ model payment {
   amount       Decimal   @db.Decimal(5, 2)
   payment_date DateTime  @db.DateTime(0)
   last_update  DateTime? @default(now()) @db.Timestamp(0)
-  customer     customer  @relation(fields: [customer_id], references: [customer_id], map: "fk_payment_customer")
+  customer     customer  @relation(fields: [customer_id], references: [customer_id], map: "fk_payment_customer", onDelete: Cascade)
   rental       rental?   @relation(fields: [rental_id], references: [rental_id], map: "fk_payment_rental")
   staff        staff     @relation(fields: [staff_id], references: [staff_id], map: "fk_payment_staff")
 
@@ -183,7 +183,7 @@ model rental {
   staff_id     Int       @db.UnsignedTinyInt
   last_update  DateTime  @default(now()) @db.Timestamp(0)
   payment      payment[]
-  customer     customer  @relation(fields: [customer_id], references: [customer_id], map: "fk_rental_customer")
+  customer     customer  @relation(fields: [customer_id], references: [customer_id], map: "fk_rental_customer", onDelete: Cascade)
   inventory    inventory @relation(fields: [inventory_id], references: [inventory_id], map: "fk_rental_inventory")
   staff        staff     @relation(fields: [staff_id], references: [staff_id], map: "fk_rental_staff")
 

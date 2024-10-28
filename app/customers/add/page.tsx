@@ -1,23 +1,17 @@
-import { getFilm } from "@/server/films/getFilm";
+import React from "react";
+import { AddCustomerForm } from "./form";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Header } from "@/components/header";
 import MobileNav, { MobileNavProps } from "@/components/mobile-nav";
 import PageWrapper from "@/components/page-wrapper";
 import SideNav, { SideNavProps } from "@/components/side-nav";
-import { formatTitleCase } from "@/lib/utils";
-import { FilmDetailsClient } from "./client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { listStores } from "@/server/stores/listStores";
+import { listAddresses } from "@/server/addresses/listAddresses";
 
-export default async function FilmDetailsPage({
-    params,
-    searchParams,
-}: {
-    params: { filmId: string };
-    searchParams: { submit?: string };
-}) {
-    const film = await getFilm({ filmId: parseInt(params.filmId) });
-    if (!film) {
-        return null;
-    }
+export default async function Page() {
+    const stores = await listStores();
+    const addresses = await listAddresses({ address: "" });
     return (
         <PageWrapper
             header={
@@ -26,10 +20,13 @@ export default async function FilmDetailsPage({
                         <Breadcrumbs
                             items={[
                                 { label: "Dashboard", href: "/" },
-                                { label: "Films", href: "/films" },
                                 {
-                                    label: formatTitleCase(film.title),
-                                    href: `/films/${params.filmId}`,
+                                    label: "Customers",
+                                    href: "/customers",
+                                },
+                                {
+                                    label: "Add Customer",
+                                    href: "/customers/add",
                                 },
                             ]}
                         />
@@ -39,13 +36,21 @@ export default async function FilmDetailsPage({
             }
             sideNav={<SideNav {...navItems} />}
         >
-            <FilmDetailsClient
-                film={film}
-                success={searchParams.submit === "success"}
-            />
+            <Card>
+                <CardHeader>
+                    <CardTitle>Add Customer</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <AddCustomerForm
+                        stores={stores}
+                        initialAddresses={addresses}
+                    />
+                </CardContent>
+            </Card>
         </PageWrapper>
     );
 }
+
 const navItems: MobileNavProps | SideNavProps = {
     logo: { icon: "Target", alt: "Pinpoint Video" },
     items: [
@@ -58,12 +63,12 @@ const navItems: MobileNavProps | SideNavProps = {
             label: "Films",
             href: "/films",
             icon: "Film",
-            active: true,
         },
         {
             label: "Customers",
             href: "/customers",
             icon: "Users",
+            active: true,
         },
     ],
 };

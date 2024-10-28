@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { formatTitleCase } from "@/lib/utils";
 import { DataTableRowActions } from "@/components/data-table/actions";
 import { Customer } from "@/types/customer";
+import { deleteCustomerAction } from "./actions";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export interface CustomerColumn {
     id: number;
@@ -54,7 +56,9 @@ export const columns: ColumnDef<Customer>[] = [
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Email" />
         ),
-        cell: ({ row }) => <Badge variant="outline">{row.getValue("email")}</Badge>,
+        cell: ({ row }) => (
+            <Badge variant="outline">{row.getValue("email")}</Badge>
+        ),
         enableSorting: false,
         enableHiding: false,
     },
@@ -65,8 +69,30 @@ export const columns: ColumnDef<Customer>[] = [
                 items={[
                     {
                         type: "link",
-                        label: "Rent",
-                        href: `/customers/${row.original.id}/rent`,
+                        label: "View",
+                        href: `/customers/${row.original.id}`,
+                    },
+                    {
+                        type: "link",
+                        label: "Edit",
+                        href: `/customers/${row.original.id}/edit`,
+                    },
+                    {
+                        type: "action",
+                        label: "Delete",
+                        action: async (
+                            router: AppRouterInstance,
+                            pathname: string,
+                            searchParams: URLSearchParams
+                        ) => {
+                            await deleteCustomerAction(row.original.id);
+                            const newPath =
+                                searchParams.keys().toArray().length > 0
+                                    ? `${pathname}?${searchParams.toString()}&delete=success`
+                                    : `${pathname}?delete=success`;
+                            console.log(newPath);
+                            router.push(newPath);
+                        },
                     },
                 ]}
             />

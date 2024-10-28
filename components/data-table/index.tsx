@@ -41,6 +41,11 @@ interface DataTableProps<TData, TValue> {
         take: number;
         rowCount: number;
     };
+    buttons?: {
+        variant: "default" | "outline";
+        label: string;
+        href: string;
+    }[];
 }
 
 function generateLink({
@@ -81,6 +86,7 @@ export function DataTable<TData, TValue>({
     url,
     filters,
     pagination: { page, take, rowCount },
+    buttons,
 }: DataTableProps<TData, TValue>) {
     const searchParams = useSearchParams();
     const [rowSelection, setRowSelection] = React.useState({});
@@ -173,6 +179,7 @@ export function DataTable<TData, TValue>({
                 table={table}
                 placeholder="Search"
                 filters={filters}
+                buttons={buttons}
             />
             <div className="">
                 <Table>

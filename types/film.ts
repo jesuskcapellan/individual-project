@@ -7,6 +7,7 @@ export interface Film {
     actors: Actor[];
     category: string;
     rentals?: number;
+    status?: "Rented out" | "Available";
 }
 
 export type Films = Film[];

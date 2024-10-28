@@ -3,10 +3,10 @@ import { Header } from "@/components/header";
 import MobileNav, { MobileNavProps } from "@/components/mobile-nav";
 import PageWrapper from "@/components/page-wrapper";
 import SideNav, { SideNavProps } from "@/components/side-nav";
-import { listTopFilms } from "./api/films/listTopFilms";
+import { listTopFilms } from "@/server/films/listTopFilms";
 import { actorColumns, filmColumns } from "./columns";
 import { Tabs, TabsTrigger, TabsContent, TabsList } from "@/components/ui/tabs";
-import { listTopActors } from "./api/actors/listTopActors";
+import { listTopActors } from "@/server/actors/listTopActors";
 import { ActorsTab, FilmsTab } from "./tabs";
 
 export default async function Home() {
