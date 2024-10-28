@@ -8,36 +8,49 @@ import { Input } from "@/components/ui/input";
 
 import { DataTableFacetedFilter } from "./filter";
 import { Filter } from "./filter";
+import { useRouter } from "next/navigation";
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>;
     placeholder: string;
     filters: Filter[];
+    buttons?: {
+        variant: "default" | "outline";
+        label: string;
+        href: string;
+    }[];
 }
 
 export function DataTableToolbar<TData>({
     table,
     placeholder,
     filters,
+    buttons,
 }: DataTableToolbarProps<TData>) {
+    const router = useRouter();
     const isFiltered = table.getState().columnFilters.length > 0;
     return (
         <div className="flex items-center justify-between">
             <div className="flex flex-1 items-center space-x-2">
-                <Input
-                    placeholder={placeholder}
-                    value={
-                        (table
-                            .getColumn("title")
-                            ?.getFilterValue() as string) ?? ""
-                    }
-                    onChange={(event) =>
-                        table
-                            .getColumn("title")
-                            ?.setFilterValue(event.target.value)
-                    }
-                    className="h-8 w-[150px] lg:w-[250px]"
-                />
+                {filters
+                    .filter((item) => item.type === "text")
+                    .map((filter) => (
+                        <Input
+                            key={filter.id}
+                            placeholder={`${placeholder} by ${filter.id}`}
+                            value={
+                                (table
+                                    .getColumn(filter.id)
+                                    ?.getFilterValue() as string) ?? ""
+                            }
+                            onChange={(event) =>
+                                table
+                                    .getColumn(filter.id)
+                                    ?.setFilterValue(event.target.value)
+                            }
+                            className="h-8 w-[150px] lg:w-[250px]"
+                        />
+                    ))}
                 {filters
                     .filter((item) => item.type === "property")
                     .map((filter) => (
@@ -61,6 +74,19 @@ export function DataTableToolbar<TData>({
                     </Button>
                 )}
             </div>
+            {buttons && (
+                <div className="flex gap-2 items-end">
+                    {buttons.map((button) => (
+                        <Button
+                            key={button.label}
+                            variant={button.variant}
+                            onClick={() => router.push(button.href)}
+                        >
+                            {button.label}
+                        </Button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

@@ -13,10 +13,10 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { listFilms } from "@/app/api/films/listFilms";
-import { listActors } from "../api/actors/listActors";
+import { listFilms } from "@/server/films/listFilms";
+import { listActors } from "@/server/actors/listActors";
 import { formatTitleCase } from "@/lib/utils";
-import { listCategories } from "../api/categories/listCategories";
+import { listCategories } from "@/server/categories/listCategories";
 import { Filter } from "@/components/data-table/filter";
 
 export default async function FilmsPage({

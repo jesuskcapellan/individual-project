@@ -1,13 +1,13 @@
 import React from "react";
-import { listFilmCopies } from "@/app/api/inventory/listFilmCopies";
-import { getFilm } from "@/app/api/films/getFilm";
+import { listFilmCopies } from "@/server/inventory/listFilmCopies";
+import { getFilm } from "@/server/films/getFilm";
 import { SelectForm } from "./form";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Header } from "@/components/header";
 import MobileNav, { MobileNavProps } from "@/components/mobile-nav";
 import PageWrapper from "@/components/page-wrapper";
 import SideNav, { SideNavProps } from "@/components/side-nav";
-import { listCustomers } from "@/app/api/categories/customers/listCustomers";
+import { listCustomers } from "@/server/customers/listCustomers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatTitleCase } from "@/lib/utils";
 
@@ -54,7 +54,7 @@ export default async function Page({ params }: { params: { filmId: string } }) {
                 <CardContent>
                     <SelectForm
                         filmCopies={copies}
-                        initialCustomers={customers}
+                        initialCustomers={customers.customers}
                     />
                 </CardContent>
             </Card>

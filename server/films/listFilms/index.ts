@@ -3,8 +3,8 @@ import { Film } from "@/types/film";
 import { Prisma } from "@prisma/client";
 
 export interface ListFilmsInput {
-    page: number;
-    take: number;
+    page?: number;
+    take?: number;
     filters: {
         search?: string;
         categories?: string[];
@@ -23,8 +23,8 @@ export interface ListFilmsResponse {
 }
 
 export async function listFilms({
-    page,
-    take,
+    page = 1,
+    take = 5,
     filters,
 }: ListFilmsInput): Promise<ListFilmsResponse> {
     const whereClause: Prisma.filmWhereInput = {};

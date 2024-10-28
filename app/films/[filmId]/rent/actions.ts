@@ -1,8 +1,8 @@
 "use server";
 
-import { listCustomers } from "@/app/api/categories/customers/listCustomers";
-import { createRental } from "@/app/api/rentals/createRental";
-import { listStaff } from "@/app/api/staff/listStaff";
+import { listCustomers } from "@/server/customers/listCustomers";
+import { createRental } from "@/server/rentals/createRental";
+import { listStaff } from "@/server/staff/listStaff";
 
 export const fetchStaff = async (storeId: number) => {
     return await listStaff({ storeId });
